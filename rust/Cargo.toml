@@ -1,0 +1,29 @@
+[package]
+name = "graphics-test"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bytemuck = "1.15.0"
+ctor = "0.2"
+futures = "0.3.30"
+log = "0.4"
+uniffi = "0.25.2"
+wgpu = "0.19.3"
+
+[target.'cfg(target_os = "android")'.dependencies]
+android_logger = "0.13"
+ndk-sys = "0.5.0"
+jni = "0.21.1"
+
+[target.'cfg(target_os = "ios")'.dependencies]
+core-graphics = "0.23.2"
+objc = "0.2.7"
+
+[target.'cfg(not(target_os = "android"))'.dependencies]
+env_logger = "0.11"
+
+[lib]
+crate-type = ["staticlib", "cdylib"]
