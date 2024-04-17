@@ -1,0 +1,10 @@
+---
+#include <stdint.h>
+
+#ifdef __cplusplus
+#define EXTERN extern "C"
+#else
+#define EXTERN extern
+#endif
+
+EXTERN int64_t RustNativeViewLib_nativeViewAsNativeHandle(void* uiView);
