@@ -16,14 +16,7 @@ uniffi {
 }
 
 kotlin {
-    androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "11"
-            }
-        }
-    }
-
+    androidTarget()
     listOf(
         iosX64(),
         iosArm64(),
@@ -34,8 +27,8 @@ kotlin {
             isStatic = true
         }
 
-        iosTarget.compilations.getByName("main").cinterops.create("graphicsTest") {
-
+        iosTarget.compilations.getByName("main") {
+            cinterops.create("graphicsTest")
         }
     }
 
@@ -55,8 +48,6 @@ kotlin {
         }
     }
 }
-
-println("ndkVersion: ${android.ndkVersion}")
 
 android {
     namespace = "me.paxbun.graphicstest"
@@ -84,8 +75,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
         viewBinding = true
@@ -94,11 +85,3 @@ android {
         debugImplementation(libs.compose.ui.tooling)
     }
 }
-dependencies {
-    implementation(libs.androidx.material)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.constraintlayout)
-    implementation(libs.navigation.fragment.ktx)
-    implementation(libs.navigation.ui.ktx)
-}
-
