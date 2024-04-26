@@ -7,9 +7,11 @@ import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.CPointed
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.objcPtr
 import kotlinx.cinterop.readValue
 import kotlinx.cinterop.toCPointer
+import kotlinx.cinterop.useContents
 import platform.CoreGraphics.CGRect
 import platform.CoreGraphics.CGRectNull
 import platform.Foundation.NSCoder
@@ -49,18 +51,31 @@ private class RustNativeView : UIView {
     constructor(frame: CValue<CGRect> = CGRectNull.readValue()) : super(frame)
 
     override fun layoutSubviews() {
-        println("layoutSubviews")
         super.layoutSubviews()
-        nativeViewContext = RustNativeViewContext(
-            RustNativeViewLib_nativeViewAsNativeHandle(
-                objcPtr().toLong().toCPointer<CPointed>()
-            ).apply {
-                if (this == 0L) {
-                    error("Could not create RustNativeViewContext")
+        if (!::nativeViewContext.isInitialized) {
+            nativeViewContext = RustNativeViewContext(
+                RustNativeViewLib_nativeViewAsNativeHandle(
+                    objcPtr().toLong().toCPointer<CPointed>()
+                ).apply {
+                    if (this == 0L) {
+                        error("Could not create RustNativeViewContext")
+                    }
+                },
+                UIScreen.mainScreen.scale.toFloat(),
+            )
+        } else {
+            memScoped {
+                val contentsScale = layer.contentsScale
+                val size = layer.bounds.useContents { size }
+                if (size.width != 0.0 && size.height != 0.0) {
+                    nativeViewContext.changeSize(
+                        (size.width * contentsScale).toInt(),
+                        (size.height * contentsScale).toInt(),
+                        contentsScale.toFloat(),
+                    )
                 }
-            },
-            UIScreen.mainScreen.scale.toFloat(),
-        )
+            }
+        }
         nativeViewContext.render()
     }
 
